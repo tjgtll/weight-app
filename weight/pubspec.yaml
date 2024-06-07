@@ -1,0 +1,36 @@
+name: weight
+description: "A new Flutter project."
+
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.3 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  csv: ^6.0.0
+  buttons_panel: ^0.0.1
+  fl_chart: ^0.67.0
+  numberpicker: ^2.1.2
+  sqflite: ^2.3.3
+  sqflite_common_ffi: ^2.3.3
+  sqflite_common_ffi_web: ^0.4.3+1
+  cupertino_icons: ^1.0.6
+  charts_flutter_new: ^0.12.0
+  material_design_icons_flutter: ^7.0.7296
+  provider: ^6.1.2
+  path: any
+  intl: any
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^3.0.0
+
+flutter:
+  assets:
+    - assets/data.csv
+  uses-material-design: true
