@@ -1,22 +1,33 @@
 class PersonData {
-  final String name;
+  final int? id;
+  final double requiredWeight;
   final double height;
+  final int age;
   final String gender;
 
-  PersonData({required this.name, required this.height, required this.gender});
+  PersonData(
+      {this.id,
+      required this.requiredWeight,
+      required this.height,
+      required this.age,
+      required this.gender});
 
   factory PersonData.fromSqfliteDatabase(Map<String, dynamic> data) {
     return PersonData(
-      name: data['name'],
+      id: data['id'],
+      requiredWeight: data['requiredWeight'],
       height: data['height'],
+      age: data['age'],
       gender: data['gender'],
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'name': name,
+      'id': id,
+      'requiredWeight': requiredWeight,
       'height': height,
+      'age': age,
       'gender': gender,
     };
   }

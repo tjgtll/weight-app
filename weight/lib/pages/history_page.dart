@@ -13,8 +13,6 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPage extends State<HistoryPage> {
-  final weightDB = WeightDB();
-
   @override
   void initState() {
     super.initState();
