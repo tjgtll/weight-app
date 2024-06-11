@@ -86,11 +86,15 @@ class WeightDataRepository extends ChangeNotifier {
   }
 
   Future<void> add(DateTime date, double weight) {
+    print("adding");
     var w = WeightData(date: date, weight: weight);
-    if (isSameDay(_weightData.last.date, date)) {
-      update(WeightData(date: _weightData.last.date, weight: weight));
-      return Future.value();
+    if (_weightData.isNotEmpty) {
+      if (isSameDay(_weightData.last.date, date)) {
+        update(WeightData(date: _weightData.last.date, weight: weight));
+        return Future.value();
+      }
     }
+
     if (_weightData.isNotEmpty) {
       var lastDate = _weightData.last.date;
       if (lastDate.year == date.year &&

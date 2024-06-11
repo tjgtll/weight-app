@@ -17,7 +17,12 @@ class SimpleTimeSeriesChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<int> dashPattern = [5, 2];
     var weightDataRepository = Provider.of<WeightDataRepository>(context);
-
+    var weightData = weightDataRepository.weightData;
+    if (weightData.isEmpty) {
+      // You can return a placeholder widget or an empty container,
+      // or handle this case in any other appropriate way.
+      return Container(); // Empty container
+    }
     final List<Series<WeightData, DateTime>> seriesList = [
       Series<WeightData, DateTime>(
         id: 'Weight',
