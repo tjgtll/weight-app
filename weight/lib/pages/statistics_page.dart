@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:weight/services/person_repository.dart';
 import 'package:weight/services/weight_repository.dart';
 import 'package:weight/widgets/custom_prety_gauge.dart';
 
@@ -14,7 +15,6 @@ class StatisticsPage extends StatefulWidget {
 
 class _HomeScreenState extends State<StatisticsPage> {
   double? bmi;
-  String errorText = '';
   String status = '';
   @override
   void initState() {
@@ -50,6 +50,7 @@ class _HomeScreenState extends State<StatisticsPage> {
   @override
   Widget build(BuildContext context) {
     var weightDataRepository = Provider.of<WeightDataRepository>(context);
+    var personDataRepository = Provider.of<PersonDataRepository>(context);
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -85,12 +86,14 @@ class _HomeScreenState extends State<StatisticsPage> {
                       ],
                       valueWidget: Text(
                         weightDataRepository
-                            .getWeightDMI(weightDataRepository.lastWeight, 175)
+                            .getWeightDMI(weightDataRepository.lastWeight,
+                                personDataRepository.personData?.height ?? 0.0)
                             .toStringAsFixed(1),
                         style: const TextStyle(fontSize: 20),
                       ),
                       currentValue: weightDataRepository.getWeightDMI(
-                          weightDataRepository.lastWeight, 187),
+                          weightDataRepository.lastWeight,
+                          personDataRepository.personData?.height ?? 0.0),
                       needleColor: Colors.blue,
                     ),
                   ])),
@@ -108,7 +111,7 @@ class _HomeScreenState extends State<StatisticsPage> {
           _textBuild("Среднее изменение за месяц",
               "${weightDataRepository.avgPerMonth().toStringAsFixed(2)} кг"),
           _textBuild("Чисдо дней до дистижения цели",
-              "${weightDataRepository.weightDayToTarget(187)}"),
+              "${weightDataRepository.weightDayToTarget(personDataRepository.personData?.height ?? 0.0)}"),
           const SizedBox(
             height: 20,
           ),
@@ -119,9 +122,6 @@ class _HomeScreenState extends State<StatisticsPage> {
           _textBuild(
               "Рекорд (минимум)", "${weightDataRepository.minWeightC} кг"),
           _textBuild("Измерения", "${weightDataRepository.length}"),
-          Text(
-            errorText,
-          ),
           const SizedBox(
             height: 20,
           ),

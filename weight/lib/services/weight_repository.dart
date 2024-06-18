@@ -12,16 +12,21 @@ class WeightDataRepository extends ChangeNotifier {
   double maxWeightC = 0;
   final weightDB = WeightDB();
   DateTime minDate = DateTime.now();
+  List<WeightData> _weightData = [];
+
   List<WeightData> _y = [];
   int get length => _weightData.length;
-  double get lastWeight => _weightData.last.weight.toDouble();
-  double get firstWeight => _weightData.first.weight.toDouble();
-  DateTime get firstDate => _weightData.first.date;
-  DateTime get lastDate => _weightData.last.date;
+  double get lastWeight =>
+      _weightData.isEmpty ? 0 : _weightData.last.weight.toDouble();
+  double get firstWeight =>
+      _weightData.isEmpty ? 0 : _weightData.first.weight.toDouble();
+  DateTime get firstDate =>
+      _weightData.isEmpty ? DateTime.now() : _weightData.first.date;
+  DateTime get lastDate =>
+      _weightData.isEmpty ? DateTime.now() : _weightData.last.date;
   List<WeightData> get weightData => _weightData;
   List<WeightData> get y => _y;
   Future<List<WeightData>>? futureWeights;
-  List<WeightData> _weightData = [];
 
   WeightDataRepository() {
     loadWeightData();
@@ -82,10 +87,13 @@ class WeightDataRepository extends ChangeNotifier {
 
   Future<void> add(DateTime date, double weight) {
     var w = WeightData(date: date, weight: weight);
-    if (isSameDay(_weightData.last.date, date)) {
-      update(WeightData(date: _weightData.last.date, weight: weight));
-      return Future.value();
+    if (_weightData.isNotEmpty) {
+      if (isSameDay(_weightData.last.date, date)) {
+        update(WeightData(date: _weightData.last.date, weight: weight));
+        return Future.value();
+      }
     }
+
     if (_weightData.isNotEmpty) {
       var lastDate = _weightData.last.date;
       if (lastDate.year == date.year &&
@@ -143,6 +151,7 @@ class WeightDataRepository extends ChangeNotifier {
   double weightChangeWeek() => _weightChangeDays(7);
 
   double weightDeviation(double height) {
+    if (_weightData.isEmpty) return 0;
     if (getNormalLowerWeight(height) > _weightData.last.weight) {
       return getNormalLowerWeight(height) - _weightData.last.weight;
     }
@@ -191,6 +200,7 @@ class WeightDataRepository extends ChangeNotifier {
   }
 
   double _weightChangeDays(int days) {
+    if (_weightData.isEmpty) return 0;
     var thirtyDaysAgo = DateTime.now().subtract(Duration(days: days));
     var result = weightData.firstWhere(
         (data) => data.date.isAfter(thirtyDaysAgo),

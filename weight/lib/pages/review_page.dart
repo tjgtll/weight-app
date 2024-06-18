@@ -23,6 +23,13 @@ class ReviewPage extends StatelessWidget {
             } else if (snapshot.hasError) {
               return const Center(child: Text('Ошибка загрузки данных'));
             } else if (snapshot.hasData) {
+              // Check if weightData is empty
+              if (weightDataRepository.weightData.isEmpty) {
+                // You can return a placeholder widget or an empty container,
+                // or handle this case in any other appropriate way.
+                return const Center(child: Text('Нет данных'));
+              }
+
               return Column(
                 children: [
                   Row(
