@@ -17,10 +17,8 @@ class PersonDataRepository extends ChangeNotifier {
     final persons = await _personDB.fetchAll();
     if (persons.isNotEmpty) {
       _personData = persons.first;
-      print(persons.first.id);
       notifyListeners();
     }
-    print("loadPersonData");
   }
 
   Future<void> addOrUpdatePersonData(PersonData personData) async {
@@ -35,6 +33,7 @@ class PersonDataRepository extends ChangeNotifier {
   }
 
   Future<void> updateHeight(double height) async {
+    loadPersonData();
     if (_personData != null) {
       _personData = PersonData(
         id: _personData!.id,
@@ -45,6 +44,9 @@ class PersonDataRepository extends ChangeNotifier {
       );
       await _personDB.update(personData: _personData!);
       notifyListeners();
+    } else {
+      addOrUpdatePersonData(PersonData(
+          requiredWeight: 100, height: height, age: 22, gender: "Male"));
     }
   }
 

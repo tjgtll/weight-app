@@ -18,7 +18,7 @@ class PersonDB {
   Future<void> create({required PersonData personData}) async {
     final database = await DatabaseService().database;
     await database.rawInsert(
-        """INSERT INTO $tableName (height, gender, age, requiredWeight) VALUES (?,?,?,?,?)""",
+        """INSERT INTO $tableName (height, gender, age, requiredWeight) VALUES (?,?,?,?)""",
         [
           personData.height,
           personData.gender,

@@ -15,12 +15,39 @@ class _ProfilePageState extends State<ProfilePage> {
   bool isFemaleSelected = false;
   bool isMaleSelected = false;
   double requiredWeight = 50;
-  final TextEditingController _controller = TextEditingController();
+
+  late TextEditingController _heightController;
+  late TextEditingController _ageController;
+  late TextEditingController _weightController;
+
+  @override
+  void initState() {
+    super.initState();
+    final personDataRepository =
+        Provider.of<PersonDataRepository>(context, listen: false);
+    _heightController = TextEditingController(
+      text: personDataRepository.personData?.height.toString() ?? '',
+    );
+    _ageController = TextEditingController(
+      text: personDataRepository.personData?.age.toString() ?? '',
+    );
+    requiredWeight = personDataRepository.personData?.requiredWeight ?? 50;
+    _weightController = TextEditingController(
+      text: requiredWeight.toStringAsFixed(1),
+    );
+  }
+
+  @override
+  void dispose() {
+    _heightController.dispose();
+    _ageController.dispose();
+    _weightController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final personDataRepository = Provider.of<PersonDataRepository>(context);
-
-    requiredWeight = personDataRepository.personData?.requiredWeight ?? 50;
 
     return SingleChildScrollView(
       child: Column(
@@ -33,6 +60,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   Expanded(
                     child: TextField(
+                      controller: _heightController,
                       decoration: const InputDecoration(labelText: "Рост"),
                       keyboardType: TextInputType.number,
                       inputFormatters: <TextInputFormatter>[
@@ -65,11 +93,17 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   Expanded(
                     child: TextField(
+                      controller: _ageController,
                       decoration: const InputDecoration(labelText: "Возраст"),
                       keyboardType: TextInputType.number,
                       inputFormatters: <TextInputFormatter>[
                         FilteringTextInputFormatter.digitsOnly
                       ],
+                      onChanged: (value) {
+                        if (value.isNotEmpty) {
+                          personDataRepository.updateAge(int.parse(value));
+                        }
+                      },
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -88,7 +122,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ],
               ),
               TextField(
-                controller: _controller,
+                controller: _weightController,
                 decoration: const InputDecoration(labelText: "Требуемый вес"),
                 readOnly: true,
                 onTap: () async {
@@ -99,7 +133,12 @@ class _ProfilePageState extends State<ProfilePage> {
                   );
 
                   if (selectedWeight != null) {
-                    _controller.text = selectedWeight.toStringAsFixed(1);
+                    setState(() {
+                      requiredWeight = selectedWeight;
+                      _weightController.text =
+                          selectedWeight.toStringAsFixed(1);
+                      personDataRepository.updateRequiredWeight(selectedWeight);
+                    });
                   }
                 },
               ),
