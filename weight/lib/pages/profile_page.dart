@@ -12,7 +12,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  bool isFemaleSelected = false;
   bool isMaleSelected = false;
   double requiredWeight = 50;
 
@@ -35,6 +34,8 @@ class _ProfilePageState extends State<ProfilePage> {
     _weightController = TextEditingController(
       text: requiredWeight.toStringAsFixed(1),
     );
+
+    isMaleSelected = personDataRepository.isMale();
   }
 
   @override
@@ -80,6 +81,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       setState(() {
                         isMaleSelected = true;
                       });
+                      personDataRepository.updateGender('Male');
                     },
                     child: Icon(
                       MdiIcons.humanMale,
@@ -112,6 +114,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       setState(() {
                         isMaleSelected = false;
                       });
+                      personDataRepository.updateGender('Female');
                     },
                     child: Icon(
                       MdiIcons.humanFemale,

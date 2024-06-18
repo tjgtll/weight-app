@@ -21,6 +21,14 @@ class PersonDataRepository extends ChangeNotifier {
     }
   }
 
+  bool isMale() {
+    String? gender = personData?.gender;
+    if (gender == 'Male') {
+      return true;
+    }
+    return false;
+  }
+
   Future<void> addOrUpdatePersonData(PersonData personData) async {
     final existingPerson = await _personDB.fetchById(personData.id);
     if (existingPerson == null) {
