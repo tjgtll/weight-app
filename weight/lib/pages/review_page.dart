@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:weight/services/person_repository.dart';
 import 'package:weight/widgets/weight_chart.dart';
 import 'package:weight/widgets/text_colored_box.dart';
 import 'package:weight/services/weight_repository.dart';
@@ -12,6 +13,7 @@ class ReviewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var weightDataRepository = Provider.of<WeightDataRepository>(context);
+    var personDataRepository = Provider.of<PersonDataRepository>(context);
 
     return Consumer<WeightDataRepository>(
       builder: (context, s, _) {
@@ -39,7 +41,8 @@ class ReviewPage extends StatelessWidget {
                           "Текущий", weightDataRepository.lastWeight,
                           style: const TextStyle(
                               color: Colors.blue, fontSize: 16)),
-                      _buildTextWithSubtext("Целевой", weightDataRepository.x),
+                      _buildTextWithSubtext(
+                          "Целевой", personDataRepository.getRequiredWeight()),
                     ],
                   ),
                   const SizedBox(height: 8),

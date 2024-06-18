@@ -40,6 +40,13 @@ class PersonDataRepository extends ChangeNotifier {
     notifyListeners();
   }
 
+  double getRequiredWeight() {
+    if (_personData != null) {
+      return _personData!.requiredWeight;
+    }
+    return 0;
+  }
+
   Future<void> updateHeight(double height) async {
     loadPersonData();
     if (_personData != null) {
