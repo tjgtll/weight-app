@@ -110,7 +110,7 @@ class _HomeScreenState extends State<StatisticsPage> {
               "${weightDataRepository.avgPerWeek().toStringAsFixed(2)} кг"),
           _textBuild("Среднее изменение за месяц",
               "${weightDataRepository.avgPerMonth().toStringAsFixed(2)} кг"),
-          _textBuild("Чисдо дней до дистижения цели",
+          _textBuild("Число дней до дистижения цели",
               "${weightDataRepository.weightDayToTarget(personDataRepository.personData?.height ?? 0.0)}"),
           const SizedBox(
             height: 20,
