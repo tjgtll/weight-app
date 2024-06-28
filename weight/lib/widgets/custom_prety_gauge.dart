@@ -141,8 +141,6 @@ class PrettyGauge extends StatefulWidget {
 }
 
 class _PrettyGaugeState extends State<PrettyGauge> {
-  //This method builds out multiple arcs that make up the Gauge
-  //using data supplied in the segments property
   List<Widget> buildGauge(List<GaugeSegment> segments) {
     List<CustomPaint> arcs = [];
     double cumulativeSegmentSize = 0.0;
@@ -178,7 +176,6 @@ class _PrettyGaugeState extends State<PrettyGauge> {
     if (widget.currentValue! > widget.maxValue) {
       currentValue = widget.maxValue;
     }
-    // Make sure the decimal place if supplied meets Darts bounds (0-20)
     if (currentValueDecimalPlaces < 0) {
       currentValueDecimalPlaces = 0;
     }

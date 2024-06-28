@@ -2,6 +2,7 @@ import 'package:charts_flutter_new/flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:weight/models/weight_data.dart';
+import 'package:weight/services/person_repository.dart';
 import 'package:weight/services/weight_repository.dart';
 
 class SimpleTimeSeriesChart extends StatelessWidget {
@@ -17,11 +18,10 @@ class SimpleTimeSeriesChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<int> dashPattern = [5, 2];
     var weightDataRepository = Provider.of<WeightDataRepository>(context);
+    var personDataRepository = Provider.of<PersonDataRepository>(context);
     var weightData = weightDataRepository.weightData;
     if (weightData.isEmpty) {
-      // You can return a placeholder widget or an empty container,
-      // or handle this case in any other appropriate way.
-      return Container(); // Empty container
+      return Container();
     }
     final List<Series<WeightData, DateTime>> seriesList = [
       Series<WeightData, DateTime>(
@@ -49,7 +49,8 @@ class SimpleTimeSeriesChart extends StatelessWidget {
         id: 'Target',
         data: weightDataRepository.y
             .map((weightData) => WeightData(
-                date: weightData.date, weight: weightDataRepository.x))
+                date: weightData.date,
+                weight: personDataRepository.getRequiredWeight()))
             .toList(),
         domainFn: (WeightData other, _) => other.date,
         measureFn: (WeightData other, _) => other.weight,

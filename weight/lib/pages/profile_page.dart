@@ -12,7 +12,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  bool isFemaleSelected = false;
   bool isMaleSelected = false;
   double requiredWeight = 50;
 
@@ -35,6 +34,8 @@ class _ProfilePageState extends State<ProfilePage> {
     _weightController = TextEditingController(
       text: requiredWeight.toStringAsFixed(1),
     );
+
+    isMaleSelected = personDataRepository.isMale();
   }
 
   @override
@@ -47,165 +48,184 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final personDataRepository = Provider.of<PersonDataRepository>(context);
+    return Consumer<PersonDataRepository>(
+      builder: (context, personDataRepository, child) {
+        _heightController.text =
+            personDataRepository.personData?.height.toString() ?? '';
+        _ageController.text =
+            personDataRepository.personData?.age.toString() ?? '';
+        requiredWeight = personDataRepository.personData?.requiredWeight ?? 50;
+        _weightController.text = requiredWeight.toStringAsFixed(1);
 
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          const Text("Обшие"),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _heightController,
-                      decoration: const InputDecoration(labelText: "Рост"),
-                      keyboardType: TextInputType.number,
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.digitsOnly
-                      ],
-                      onChanged: (value) {
-                        if (value.isNotEmpty) {
+        isMaleSelected = personDataRepository.isMale();
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              const Text("Обшие"),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _heightController,
+                          decoration: const InputDecoration(labelText: "Рост"),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                          onSubmitted: (value) {
+                            if (value.isNotEmpty) {
+                              personDataRepository
+                                  .updateHeight(double.parse(value));
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isMaleSelected = true;
+                          });
+                          personDataRepository.updateGender('Male');
+                        },
+                        child: Icon(
+                          MdiIcons.humanMale,
+                          size: 50,
+                          color: isMaleSelected ? Colors.blue : Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _ageController,
+                          decoration:
+                              const InputDecoration(labelText: "Возраст"),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                          onChanged: (value) {
+                            if (value.isNotEmpty) {
+                              personDataRepository.updateAge(int.parse(value));
+                            }
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isMaleSelected = false;
+                          });
+                          personDataRepository.updateGender('Female');
+                        },
+                        child: Icon(
+                          MdiIcons.humanFemale,
+                          size: 50,
+                          color: !isMaleSelected ? Colors.blue : Colors.grey,
+                        ),
+                      ),
+                    ],
+                  ),
+                  TextField(
+                    controller: _weightController,
+                    decoration:
+                        const InputDecoration(labelText: "Требуемый вес"),
+                    readOnly: true,
+                    onTap: () async {
+                      double? selectedWeight = await showDialog<double>(
+                        context: context,
+                        builder: (context) =>
+                            WeightPickerDialog(initialWeight: requiredWeight),
+                      );
+
+                      if (selectedWeight != null) {
+                        setState(() {
+                          requiredWeight = selectedWeight;
+                          _weightController.text =
+                              selectedWeight.toStringAsFixed(1);
                           personDataRepository
-                              .updateHeight(double.parse(value));
-                        }
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        isMaleSelected = true;
-                      });
+                              .updateRequiredWeight(selectedWeight);
+                        });
+                      }
                     },
-                    child: Icon(
-                      MdiIcons.humanMale,
-                      size: 50,
-                      color: isMaleSelected ? Colors.blue : Colors.grey,
-                    ),
                   ),
                 ],
               ),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _ageController,
-                      decoration: const InputDecoration(labelText: "Возраст"),
-                      keyboardType: TextInputType.number,
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.digitsOnly
-                      ],
-                      onChanged: (value) {
-                        if (value.isNotEmpty) {
-                          personDataRepository.updateAge(int.parse(value));
-                        }
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        isMaleSelected = false;
-                      });
+              const SizedBox(height: 20),
+              const Text("Резервир. и восстановить"),
+              ElevatedButton(
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
+                          side: BorderSide(color: Colors.blue))),
+                  minimumSize: MaterialStateProperty.all<Size>(
+                      const Size(double.infinity, 48)),
+                  fixedSize:
+                      MaterialStateProperty.all<Size>(const Size(48, 48)),
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.blue),
+                  overlayColor: MaterialStateProperty.resolveWith<Color?>(
+                    (Set<MaterialState> states) {
+                      if (states.contains(MaterialState.hovered)) {
+                        return Colors.blue.withOpacity(0.04);
+                      }
+                      if (states.contains(MaterialState.focused) ||
+                          states.contains(MaterialState.pressed)) {
+                        return Colors.blue.withOpacity(0.12);
+                      }
+                      return null;
                     },
-                    child: Icon(
-                      MdiIcons.humanFemale,
-                      size: 50,
-                      color: !isMaleSelected ? Colors.blue : Colors.grey,
-                    ),
                   ),
-                ],
+                ),
+                child: const Text("Экспорт в файл CSV"),
+                onPressed: () => {},
               ),
-              TextField(
-                controller: _weightController,
-                decoration: const InputDecoration(labelText: "Требуемый вес"),
-                readOnly: true,
-                onTap: () async {
-                  double? selectedWeight = await showDialog<double>(
-                    context: context,
-                    builder: (context) =>
-                        WeightPickerDialog(initialWeight: requiredWeight),
-                  );
-
-                  if (selectedWeight != null) {
-                    setState(() {
-                      requiredWeight = selectedWeight;
-                      _weightController.text =
-                          selectedWeight.toStringAsFixed(1);
-                      personDataRepository.updateRequiredWeight(selectedWeight);
-                    });
-                  }
-                },
+              ElevatedButton(
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
+                          side: BorderSide(
+                              color: Color.fromARGB(255, 163, 186, 205)))),
+                  minimumSize: MaterialStateProperty.all<Size>(
+                      const Size(double.infinity, 48)),
+                  fixedSize:
+                      MaterialStateProperty.all<Size>(const Size(48, 48)),
+                  foregroundColor:
+                      MaterialStateProperty.all<Color>(Colors.blue),
+                  overlayColor: MaterialStateProperty.resolveWith<Color?>(
+                    (Set<MaterialState> states) {
+                      if (states.contains(MaterialState.hovered)) {
+                        return Colors.blue.withOpacity(0.04);
+                      }
+                      if (states.contains(MaterialState.focused) ||
+                          states.contains(MaterialState.pressed)) {
+                        return Colors.blue.withOpacity(0.12);
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                child: const Text("Импорт из файла CSV"),
+                onPressed: () => {},
               ),
+              const Text(
+                "develop by Volod1n (version 0.0.1)",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 10, color: Colors.grey),
+              )
             ],
           ),
-          const SizedBox(height: 20),
-          const Text("Резервир. и восстановить"),
-          ElevatedButton(
-            style: ButtonStyle(
-              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                  const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.zero,
-                      side: BorderSide(color: Colors.blue))),
-              minimumSize: MaterialStateProperty.all<Size>(
-                  const Size(double.infinity, 48)),
-              fixedSize: MaterialStateProperty.all<Size>(const Size(48, 48)),
-              foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-              overlayColor: MaterialStateProperty.resolveWith<Color?>(
-                (Set<MaterialState> states) {
-                  if (states.contains(MaterialState.hovered)) {
-                    return Colors.blue.withOpacity(0.04);
-                  }
-                  if (states.contains(MaterialState.focused) ||
-                      states.contains(MaterialState.pressed)) {
-                    return Colors.blue.withOpacity(0.12);
-                  }
-                  return null;
-                },
-              ),
-            ),
-            child: const Text("Экспорт в файл CSV"),
-            onPressed: () => {},
-          ),
-          ElevatedButton(
-            style: ButtonStyle(
-              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                  const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.zero,
-                      side: BorderSide(
-                          color: Color.fromARGB(255, 163, 186, 205)))),
-              minimumSize: MaterialStateProperty.all<Size>(
-                  const Size(double.infinity, 48)),
-              fixedSize: MaterialStateProperty.all<Size>(const Size(48, 48)),
-              foregroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-              overlayColor: MaterialStateProperty.resolveWith<Color?>(
-                (Set<MaterialState> states) {
-                  if (states.contains(MaterialState.hovered)) {
-                    return Colors.blue.withOpacity(0.04);
-                  }
-                  if (states.contains(MaterialState.focused) ||
-                      states.contains(MaterialState.pressed)) {
-                    return Colors.blue.withOpacity(0.12);
-                  }
-                  return null;
-                },
-              ),
-            ),
-            child: const Text("Импорт из файла CSV"),
-            onPressed: () => {},
-          ),
-          const Text(
-            "develop by Volod1n (version 0.0.1)",
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 10, color: Colors.grey),
-          )
-        ],
-      ),
+        );
+      },
     );
   }
 }

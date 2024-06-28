@@ -21,6 +21,14 @@ class PersonDataRepository extends ChangeNotifier {
     }
   }
 
+  bool isMale() {
+    String? gender = personData?.gender;
+    if (gender == 'Male') {
+      return true;
+    }
+    return false;
+  }
+
   Future<void> addOrUpdatePersonData(PersonData personData) async {
     final existingPerson = await _personDB.fetchById(personData.id);
     if (existingPerson == null) {
@@ -30,6 +38,13 @@ class PersonDataRepository extends ChangeNotifier {
     }
     _personData = personData;
     notifyListeners();
+  }
+
+  double getRequiredWeight() {
+    if (_personData != null) {
+      return _personData!.requiredWeight;
+    }
+    return 0;
   }
 
   Future<void> updateHeight(double height) async {
